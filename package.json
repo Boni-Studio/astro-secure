@@ -1,6 +1,6 @@
 {
   "name": "@boni-studio/astro-secure",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Secure-by-default baseline for Astro sites on Cloudflare: CSP as real headers, security headers, bot protection helpers, AI crawler policy.",
   "license": "MIT",
   "type": "module",
@@ -36,10 +36,11 @@
     "astro-secure": "dist/cli.js"
   },
   "files": [
-    "dist",
-    "components",
+    "CHANGELOG.md",
     "README.md",
-    "SECURITY.md"
+    "SECURITY.md",
+    "components",
+    "dist"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",

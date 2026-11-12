@@ -83,9 +83,28 @@ function routePaths(route: string): string[] {
 
 export function renderHeaderRules(rules: HeaderRule[]): string {
   return rules
-    .map((r) => [r.path, ...Object.entries(r.headers).map(([k, v]) => `  ${k}: ${v}`)].join('\n'))
+    .map((r) => {
+      for (const part of [r.path, ...Object.keys(r.headers), ...Object.values(r.headers)]) {
+        if (/[\r\n\0]/.test(part)) throw new Error('[astro-secure] Header rule contains a line break (injection attempt?).');
+      }
+      return [r.path, ...Object.entries(r.headers).map(([k, v]) => `  ${k}: ${v}`)].join('\n');
+    })
     .join('\n');
 }
+
+/** Headers no `_headers` rule may detach with `! Header-Name`. */
+export const PROTECTED_HEADERS = [
+  'content-security-policy',
+  'strict-transport-security',
+  'x-frame-options',
+  'x-content-type-options',
+  'referrer-policy',
+  'permissions-policy',
+  'cross-origin-opener-policy',
+  'cross-origin-resource-policy',
+  'reporting-endpoints',
+  'x-robots-tag',
+];
 
 const MARK_START = '# --- astro-secure:start (generated, do not edit) ---';
 const MARK_END = '# --- astro-secure:end ---';
@@ -115,6 +134,10 @@ export function validateHeadersFile(content: string): string[] {
   lines.forEach((line, i) => {
     if (line.length > HEADERS_MAX_LINE) {
       errors.push(`_headers line ${i + 1} has ${line.length} characters (max ${HEADERS_MAX_LINE}).`);
+    }
+    const detach = line.match(/^\s+!\s*([A-Za-z-]+)/);
+    if (detach && PROTECTED_HEADERS.includes(detach[1]!.toLowerCase())) {
+      errors.push(`_headers line ${i + 1} removes the security header "${detach[1]}" (! ...). Not allowed.`);
     }
   });
   return errors;

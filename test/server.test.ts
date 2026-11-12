@@ -52,10 +52,10 @@ describe('form helpers', () => {
   it('detects honeypot and too-fast submissions', () => {
     expect(honeypotTriggered('')).toBe(false);
     expect(honeypotTriggered('http://spam')).toBe(true);
-    const now = 1_000_000;
-    expect(submittedTooFast(String(now - 1000), 3000, now)).toBe(true);
-    expect(submittedTooFast(String(now - 5000), 3000, now)).toBe(false);
-    expect(submittedTooFast('nope', 3000, now)).toBe(true);
+    expect(submittedTooFast('1000')).toBe(true);
+    expect(submittedTooFast('5000')).toBe(false);
+    expect(submittedTooFast('nope')).toBe(true);
+    expect(submittedTooFast('-5')).toBe(true);
   });
   it('blocks email header injection', () => {
     expect(sanitizeHeaderValue('Hola\r\nBcc: victim@example.com')).toBe('Hola Bcc: victim@example.com');

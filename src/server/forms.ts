@@ -5,13 +5,13 @@ export function honeypotTriggered(value: unknown): boolean {
 
 /**
  * The form was submitted faster than a human could fill it.
- * `startedAt` is set by client script when the form becomes visible; it is a weak signal
- * (bots can forge it) and complements Turnstile, it never replaces it.
+ * `elapsedMs` is the time the visitor spent on the form, measured by the client with
+ * `performance.now()` (a duration, so the client's clock skew does not matter). It is a weak
+ * signal (bots can forge it) and complements Turnstile, it never replaces it.
  */
-export function submittedTooFast(startedAt: unknown, minMs = 3000, now = Date.now()): boolean {
-  const started = typeof startedAt === 'string' ? Number(startedAt) : typeof startedAt === 'number' ? startedAt : NaN;
-  if (!Number.isFinite(started)) return true;
-  const elapsed = now - started;
+export function submittedTooFast(elapsedMs: unknown, minMs = 3000): boolean {
+  const elapsed = typeof elapsedMs === 'string' && /^\d{1,9}$/.test(elapsedMs) ? Number(elapsedMs) : typeof elapsedMs === 'number' ? elapsedMs : NaN;
+  if (!Number.isFinite(elapsed) || elapsed < 0) return true;
   return elapsed < minMs || elapsed > 24 * 3600 * 1000;
 }
 

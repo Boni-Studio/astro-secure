@@ -60,6 +60,15 @@ import { verifyTurnstile, checkRateLimit, rateLimitKey, clientIp } from '@boni-s
 See [`src/options.ts`](src/options.ts). Every third-party host must be declared explicitly
 (`allow`, `embeds`, `turnstile`, `cloudflareAnalytics`); unsafe sources are rejected at build time.
 
+## Build fails (fail closed) when
+
+- an on-demand route (any origin) is not in `allowedServerRoutes`;
+- `astro.config` sets `security.csp`;
+- `public/robots.txt`, `public/.well-known/security.txt` or `public/_headers` lines `! <security header>` exist;
+- `public/_redirects` exists (unless `allowRedirectsFile: true`);
+- pages use server islands (unless `allowServerIslands: true`);
+- the generated CSP fails the audit, or `_headers` exceeds Cloudflare limits.
+
 ## Constraints imposed by the CSP
 
 - No inline `style=""` or `on*=""` attributes.

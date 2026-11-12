@@ -51,8 +51,11 @@ export async function verifyTurnstile(opts: VerifyTurnstileOptions): Promise<Tur
   } catch {
     return { success: false, errors: ['network-error'] };
   }
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
+    return { success: false, errors: ['invalid-response'] };
+  }
 
-  const errors = [...(data['error-codes'] ?? [])];
+  const errors = Array.isArray(data['error-codes']) ? data['error-codes'].map(String) : [];
   if (!data.success) return { success: false, errors: errors.length ? errors : ['unsuccessful'] };
 
   if (opts.expectedHostname) {
