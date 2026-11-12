@@ -1,0 +1,13 @@
+---
+/**
+ * Cloudflare Web Analytics (cookieless, no consent banner needed).
+ * Requires `cloudflareAnalytics: true` in astro-secure options.
+ * Renders nothing when no token is provided (e.g. local and preview builds).
+ */
+interface Props {
+  token?: string | undefined;
+}
+const { token } = Astro.props;
+const beacon = token ? JSON.stringify({ token }) : null;
+---
+{beacon && <script is:inline defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon={beacon}></script>}

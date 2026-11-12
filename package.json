@@ -1,0 +1,58 @@
+{
+  "name": "@boni-studio/astro-secure",
+  "version": "0.1.0",
+  "description": "Secure-by-default baseline for Astro sites on Cloudflare: CSP as real headers, security headers, bot protection helpers, AI crawler policy.",
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Boni-Studio/astro-secure.git"
+  },
+  "keywords": ["astro", "astro-integration", "security", "csp", "cloudflare"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./adapter": {
+      "types": "./dist/adapter.d.ts",
+      "import": "./dist/adapter.js"
+    },
+    "./server": {
+      "types": "./dist/server/index.d.ts",
+      "import": "./dist/server/index.js"
+    },
+    "./middleware": "./dist/middleware.js",
+    "./routes/csp-report": "./dist/routes/csp-report.js",
+    "./components/*": "./components/*"
+  },
+  "bin": {
+    "astro-secure": "./dist/cli.js"
+  },
+  "files": ["dist", "components", "README.md", "SECURITY.md"],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "prepublishOnly": "pnpm run build && pnpm run test"
+  },
+  "peerDependencies": {
+    "@astrojs/cloudflare": "^14.4.0",
+    "astro": "^7.4.0"
+  },
+  "devDependencies": {
+    "@astrojs/cloudflare": "14.4.6",
+    "@types/node": "26.6.6",
+    "astro": "7.4.7",
+    "typescript": "6.0.3",
+    "vitest": "5.1.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "engines": {
+    "node": ">=22.23.4"
+  },
+  "packageManager": "pnpm@12.18.0"
+}

@@ -1,0 +1,17 @@
+---
+/**
+ * Cloudflare Turnstile widget. Place inside a <form>; it adds the `cf-turnstile-response` field.
+ * The token MUST be verified server-side with `verifyTurnstile` from `@boni-studio/astro-secure/server`.
+ */
+interface Props {
+  siteKey: string;
+  /** Must match `expectedAction` on the server. */
+  action: string;
+  theme?: 'auto' | 'light' | 'dark';
+  language?: string;
+}
+const { siteKey, action, theme = 'auto', language = 'auto' } = Astro.props;
+if (!/^[\w-]{1,32}$/.test(action)) throw new Error('Turnstile action must be alphanumeric (max 32).');
+---
+<div class="cf-turnstile" data-sitekey={siteKey} data-action={action} data-theme={theme} data-language={language} data-appearance="interaction-only"></div>
+<script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>

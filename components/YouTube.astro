@@ -1,0 +1,39 @@
+---
+/**
+ * Click-to-load YouTube embed (privacy-enhanced domain).
+ * Requires `embeds: ['youtube']` in astro-secure options.
+ * Nothing is loaded from YouTube except the thumbnail until the user clicks.
+ */
+interface Props {
+  id: string;
+  title: string;
+  /** Text on the play button (localize per site). */
+  label?: string;
+}
+const { id, title, label = 'Reproducir video' } = Astro.props;
+if (!/^[\w-]{6,20}$/.test(id)) throw new Error(`Invalid YouTube id: ${id}`);
+const thumb = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+---
+<div class="as-embed" data-as-embed={`https://www.youtube-nocookie.com/embed/${id}?autoplay=1`} data-as-title={title}>
+  <button type="button" class="as-embed__button" aria-label={`${label}: ${title}`}>
+    <img src={thumb} alt="" loading="lazy" decoding="async" width="480" height="360" class="as-embed__thumb" />
+    <span class="as-embed__label">{label}</span>
+  </button>
+</div>
+
+<style>
+  .as-embed { position: relative; aspect-ratio: 16 / 9; background: #000; }
+  .as-embed__button { all: unset; cursor: pointer; display: block; position: absolute; inset: 0; }
+  .as-embed__button:focus-visible { outline: 3px solid currentColor; outline-offset: 3px; }
+  .as-embed__thumb { width: 100%; height: 100%; object-fit: cover; }
+  .as-embed__label {
+    position: absolute; inset: auto 0 1rem; margin-inline: auto; width: fit-content;
+    padding: 0.5rem 1rem; background: rgb(0 0 0 / 0.75); color: #fff; border-radius: 999px;
+  }
+  .as-embed iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+</style>
+
+<script>
+  import { activateEmbeds } from './embed-client.js';
+  activateEmbeds();
+</script>

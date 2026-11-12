@@ -1,0 +1,15 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", "helpers:pinGitHubActionDigests"],
+  "minimumReleaseAge": "3 days",
+  "rangeStrategy": "pin",
+  "schedule": ["before 6am on monday"],
+  "packageRules": [
+    {
+      "description": "The adapter wrapper depends on adapter internals: always review manually",
+      "matchPackageNames": ["@astrojs/cloudflare", "astro"],
+      "automerge": false,
+      "labels": ["adapter-compat"]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+# Supply-chain hardening (see SPEC §5.7)
+# Do not install versions published less than 3 days ago (protects against hijacked releases).
+minimumReleaseAge: 4320
+# Fail if a dependency that was published with provenance loses it in a newer version.
+trustPolicy: no-downgrade
+# Only pinned registry tarballs; no git/URL subdependencies.
+blockExoticSubdeps: true
+# Install scripts are blocked unless explicitly reviewed here.
+strictDepBuilds: true
+allowBuilds:
+  esbuild: true
+  workerd: true
+  sharp: true

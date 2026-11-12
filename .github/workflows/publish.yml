@@ -1,0 +1,39 @@
+name: Publish
+
+# Publishing happens only from a GitHub Release, through npm Trusted Publishing (OIDC).
+# No long-lived npm token exists anywhere. Configure the trusted publisher on npmjs.com:
+#   package @boni-studio/astro-secure → Trusted publishers → GitHub Actions →
+#   Boni-Studio/astro-secure, workflow publish.yml, environment npm.
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: npm # protected: requires approval
+    permissions:
+      contents: read
+      id-token: write # OIDC for npm trusted publishing + provenance
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          registry-url: https://registry.npmjs.org
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run typecheck
+      - run: pnpm test
+      - run: pnpm run build
+      - name: Verify tag matches package version
+        run: |
+          test "v$(node -p "require('./package.json').version")" = "${GITHUB_REF_NAME}"
+      - run: npm publish --provenance --access public
