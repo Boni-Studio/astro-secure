@@ -5,7 +5,7 @@ import { withHeaderOnlyDirectives } from './csp.js';
 import { baseHeaders } from './headers.js';
 import { resolveOptions } from './options.js';
 
-const o = resolveOptions({ securityContact: 'n/a', ...config });
+const o = resolveOptions(config);
 const BASE = baseHeaders(o);
 
 /**

@@ -34,7 +34,7 @@ describe('checkBuild', () => {
     );
     const { errors } = await checkBuild(dir);
     expect(errors.some((e) => e.includes('inline event handler'))).toBe(true);
-    expect(errors.some((e) => e.includes('style=""'))).toBe(true);
+    expect(errors.some((e) => e.includes('inline style'))).toBe(true);
     expect(errors.some((e) => e.includes('evil.com'))).toBe(true);
   });
 });

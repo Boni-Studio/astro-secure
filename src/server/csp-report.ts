@@ -48,7 +48,7 @@ export function summarizeCspReports(body: unknown, max = 20): CspViolationSummar
     };
     const source = stripUrl(b.sourceFile);
     if (source) summary.source = source;
-    if (typeof b.disposition === 'string') summary.disposition = b.disposition;
+    if (typeof b.disposition === 'string') summary.disposition = b.disposition.slice(0, 20);
     return summary;
   });
 }

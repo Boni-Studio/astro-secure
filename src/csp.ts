@@ -85,17 +85,41 @@ export function normalizeCsp(csp: string): string {
 
 /** Append header-only directives unless already present. */
 export function withHeaderOnlyDirectives(csp: string, reportPath: string): string {
+  if (!/^\/[a-z0-9_/-]{1,100}$/.test(reportPath)) throw new Error(`[astro-secure] Invalid CSP report path "${reportPath}".`);
   const normalized = normalizeCsp(csp);
-  const present = new Set(normalized.split('; ').map((d) => d.split(' ')[0]));
+  const present = new Set(normalized.split('; ').map((d) => d.split(' ')[0]?.toLowerCase()));
   const extra = headerOnlyDirectives(reportPath).filter((d) => !present.has(d.split(' ')[0]));
   return extra.length ? `${normalized}; ${extra.join('; ')}` : normalized;
 }
 
+/**
+ * Parse a CSP like a browser: directive names and keywords are case-insensitive, and when a
+ * directive is repeated the FIRST occurrence wins (later ones are ignored).
+ * Values are lowercased so checks cannot be bypassed with 'UNSAFE-INLINE' (hashes keep their case).
+ */
 export function parseCsp(csp: string): Map<string, string[]> {
   const map = new Map<string, string[]>();
   for (const directive of normalizeCsp(csp).split('; ')) {
-    const [name, ...values] = directive.split(' ');
-    if (name) map.set(name.toLowerCase(), values);
+    const [rawName, ...values] = directive.split(' ');
+    const name = rawName?.toLowerCase();
+    if (!name || map.has(name)) continue;
+    map.set(
+      name,
+      values.map((v) => (/^'(sha256|sha384|sha512|nonce)-/i.test(v) ? v : v.toLowerCase())),
+    );
   }
   return map;
+}
+
+/** Directive names that appear more than once (browsers ignore all but the first). */
+export function duplicateDirectives(csp: string): string[] {
+  const seen = new Set<string>();
+  const dup = new Set<string>();
+  for (const directive of normalizeCsp(csp).split('; ')) {
+    const name = directive.split(' ')[0]?.toLowerCase();
+    if (!name) continue;
+    if (seen.has(name)) dup.add(name);
+    seen.add(name);
+  }
+  return [...dup];
 }
