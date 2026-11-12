@@ -1,6 +1,7 @@
 name: Publish
 
-# Publishing happens only from a GitHub Release, through npm Trusted Publishing (OIDC).
+# Publishing happens only from a GitHub Release, through npm Trusted Publishing (OIDC),
+# and goes live only after a maintainer approves the staged version with 2FA.
 # No long-lived npm token exists anywhere. Configure the trusted publisher on npmjs.com:
 #   package @boni-studio/astro-secure → Trusted publishers → GitHub Actions →
 #   Boni-Studio/astro-secure, workflow publish.yml, environment npm.
@@ -36,4 +37,6 @@ jobs:
       - name: Verify tag matches package version
         run: |
           test "v$(node -p "require('./package.json').version")" = "${GITHUB_REF_NAME}"
-      - run: npm publish --provenance --access public
+      # Trusted publisher permission is "stage publish": CI can only STAGE the version.
+      # A maintainer approves it with 2FA (npmjs.com → Staged Packages, or `npm stage approve <id>`).
+      - run: npm stage publish --provenance --access public
