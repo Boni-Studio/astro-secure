@@ -156,3 +156,20 @@ describe('A7/F12 csp-report reads bounded bodies', () => {
     expect(s!.disposition!.length).toBe(20);
   });
 });
+
+describe('CSP is not applied in astro dev (Vite injects unhashed styles)', () => {
+  const run = (command: string) => {
+    let update: Record<string, any> = {};
+    const hook = secure({ securityContact: 'a@b.co' }).hooks['astro:config:setup'] as (o: unknown) => void;
+    hook({
+      config: { security: {}, image: {} },
+      command,
+      updateConfig: (u: Record<string, any>) => (update = u),
+      injectRoute: () => {},
+      addMiddleware: () => {},
+    });
+    return update;
+  };
+  it('dev: no CSP', () => expect(run('dev').security.csp).toBeUndefined());
+  it('build: CSP enabled', () => expect(run('build').security.csp.directives).toContain("object-src 'none'"));
+});

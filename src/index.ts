@@ -42,8 +42,12 @@ export default function secure(userOptions: SecureOptions): AstroIntegration {
         updateConfig({
           security: {
             checkOrigin: true,
-            // Directive strings are validated in options.ts; Astro types them as template literals.
-            csp: buildAstroCsp(o) as NonNullable<NonNullable<Parameters<typeof updateConfig>[0]['security']>['csp']>,
+            // CSP only for builds: in `astro dev` Vite injects unhashed <style> tags (HMR) that a strict
+            // CSP blocks, and Astro does not support CSP in dev. Security is tested on `build` + `wrangler dev`.
+            ...(command !== 'dev' && {
+              // Directive strings are validated in options.ts; Astro types them as template literals.
+              csp: buildAstroCsp(o) as NonNullable<NonNullable<Parameters<typeof updateConfig>[0]['security']>['csp']>,
+            }),
           },
           // Images are optimized at build time. Astro still injects an on-demand image endpoint
           // whenever the site has server code; in production it answers 404 instead of proxying.

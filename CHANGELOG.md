@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.1 — 2026-11-13
+
+### Fixed
+
+- The CSP is no longer applied in `astro dev`. Vite injects unhashed `<style>` tags during
+  development, so the strict CSP left pages without CSS. Builds (`astro build`, `wrangler dev`,
+  production) are unchanged.
+
 ## 0.2.0 — 2026-11-12
 
 Fixes from the security review of 2026-11-12. Several changes make builds fail where they
